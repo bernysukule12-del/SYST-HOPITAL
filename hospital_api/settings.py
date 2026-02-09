@@ -28,7 +28,7 @@ SECRET_KEY = config('DJANGO_SECRET_KEY', default='django-insecure-dev-key-change
 DEBUG = config('DJANGO_DEBUG', default=True, cast=bool)
 
 # Hosts - load from env or default
-ALLOWED_HOSTS = config('DJANGO_ALLOWED_HOSTS', default='127.0.0.1,localhost', cast=Csv())
+ALLOWED_HOSTS = config('DJANGO_ALLOWED_HOSTS', default='127.0.0.1,localhost,testserver', cast=Csv())
 
 # CORS allowed origins
 CORS_ALLOWED_ORIGINS = config('CORS_ALLOWED_ORIGINS', default='http://localhost:3000,http://localhost:8000', cast=Csv())
@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'django_filters',
     'corsheaders',
+    'drf_spectacular',
     'api',
     'gestion',
 ]
@@ -172,7 +173,8 @@ REST_FRAMEWORK = {
     'DEFAULT_THROTTLE_RATES': {
         'anon': '100/hour',
         'user': '1000/hour'
-    }
+    },
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
 # JWT Settings
@@ -245,3 +247,19 @@ LOGGING = {
     },
 }
 
+# drf-spectacular OpenAPI 3.0.3 Schema Generation
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Hospital Management System API',
+    'DESCRIPTION': 'RESTful API for managing hospital operations, patients, doctors, appointments, and consultations',
+    'VERSION': '1.0.0',
+    'SERVE_PERMISSIONS': ['rest_framework.permissions.IsAuthenticated'],
+    'AUTHENTICATION_WHITELIST': [
+        'api.views.TokenObtainPairView',
+        'api.views.TokenRefreshView',
+        'api.views.TokenVerifyView',
+    ],
+    'SCHEMA_PATH_PREFIX': r'/api',
+    'DEFAULT_GENERATOR_CLASS': 'drf_spectacular.generators.SchemaGenerator',
+    'COERCE_DECIMAL_TO_STRING': False,
+    'ENUM_ADD_EXPLICIT_BLANK_CHOICE': False,
+}
